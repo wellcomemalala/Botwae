@@ -1,31 +1,26 @@
-// daily-reminder.js
-const fetch = require("node-fetch");
+import fetch from "node-fetch";
 
-const TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN;
-const GROUP_ID = process.env.GROUP_ID; 
-const MESSAGE_TEXT = process.env.MESSAGE_TEXT || "วันนี้ใช้น้ำมันไปกี่ถุงจ๊ะ";
+export default async (req, context) => {
+  const LINE_ACCESS_TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN;
+  const GROUP_ID = process.env.GROUP_ID;
+  const MESSAGE_TEXT = process.env.MESSAGE_TEXT || "ถึงเวลา 16:00 แล้วครับ!";
 
-exports.handler = async () => {
-  if (!GROUP_ID) {
-    return { statusCode: 200, body: "NO_GROUP_ID" };
-  }
+  const url = "https://api.line.me/v2/bot/message/push";
 
-  try {
-    const res = await fetch("https://api.line.me/v2/bot/message/push", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${TOKEN}`,
-      },
-      body: JSON.stringify({
-        to: GROUP_ID,
-        messages: [{ type: "text", text: MESSAGE_TEXT }],
-      }),
-    });
+  const body = {
+    to: GROUP_ID,
+    messages: [{ type: "text", text: MESSAGE_TEXT }],
+  };
 
-    const text = await res.text();
-    return { statusCode: 200, body: `PUSH ${res.status}: ${text}` };
-  } catch (err) {
-    return { statusCode: 200, body: "ERROR " + (err?.message || String(err)) };
-  }
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${LINE_ACCESS_TOKEN}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await res.json();
+  return new Response(JSON.stringify(data), { status: 200 });
 };
