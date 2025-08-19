@@ -1,7 +1,7 @@
-[build]
-  functions = "netlify/functions"
+[functions]
+  node_bundler = "esbuild"
 
-# Scheduled Function: 16:00 Asia/Bangkok (09:00 UTC), Monday-Saturday
 [[scheduled]]
+  name = "daily-reminder"
+  # ทำงานเวลา 16:00 ทุกวันจันทร์ถึงเสาร์ (UTC+7 ต้องลบ 7 ชั่วโมง → 09:00 UTC)
   cron = "0 9 * * 1-6"
-  path = "/.netlify/functions/daily-reminder"
