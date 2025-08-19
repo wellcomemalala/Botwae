@@ -1,26 +1,44 @@
+// ใช้ ES Module import แทน require
 import fetch from "node-fetch";
 
-export default async (req, context) => {
-  const LINE_ACCESS_TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN;
-  const GROUP_ID = process.env.GROUP_ID;
-  const MESSAGE_TEXT = process.env.MESSAGE_TEXT || "ถึงเวลา 16:00 แล้วครับ!";
+export async function handler(event, context) {
+  try {
+    // ข้อความที่จะแจ้งเตือน
+    const message = "⏰ ถึงเวลา 16.00 น. แล้วนะครับ แวะถัวะ!";
 
-  const url = "https://api.line.me/v2/bot/message/push";
+    // เรียก API LINE Messaging
+    const response = await fetch("https://api.line.me/v2/bot/message/broadcast", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.LINE_CHANNEL_ACCESS_TOKEN}`
+      },
+      body: JSON.stringify({
+        messages: [
+          {
+            type: "text",
+            text: message
+          }
+        ]
+      })
+    });
 
-  const body = {
-    to: GROUP_ID,
-    messages: [{ type: "text", text: MESSAGE_TEXT }],
-  };
+    // ตรวจสอบผลลัพธ์
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`LINE API error: ${response.status} - ${errorText}`);
+    }
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${LINE_ACCESS_TOKEN}`,
-    },
-    body: JSON.stringify(body),
-  });
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ success: true, message: "ส่งข้อความเรียบร้อยแล้ว!" })
+    };
 
-  const data = await res.json();
-  return new Response(JSON.stringify(data), { status: 200 });
-};
+  } catch (error) {
+    console.error("Error:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ success: false, error: error.message })
+    };
+  }
+}
