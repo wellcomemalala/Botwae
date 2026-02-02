@@ -13,7 +13,7 @@ export async function handler() {
   const url = "https://api.line.me/v2/bot/message/push";
   const payload = {
     to: GROUP_ID,                         // ส่งเข้ากลุ่ม
-    messages: [{ type: "text", text: MESSAGE_TEXT || "วันนี้ใช้น้ำมันไปกี่ถุงครับ คุณนายซี และมาดามเจี๊ยบ  โปรดตอบผมด้วย  ถ้าไม่มีการตอบรับ ใครก็ได้ไปตามมาตอบกระผมที" }]
+    messages: [{ type: "text", text: MESSAGE_TEXT || "วันนี้ใช้น้ำมันไปกี่ถุงครับ คุณนายซี และมาดามเจี๊ยบ  ลงในระบบ สต๊อคแมคโครกันด้วยนะครับ ลงแล้วทักมาบอกด้วยเด้อ" }]
   };
 
   const res = await fetch(url, {
